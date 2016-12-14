@@ -78,17 +78,21 @@ int main() {
 	int i = 0;
 	for (int z = 0; z < cols; z++) {
 		for (int x = 0; x < rows; x++) {
+			// position
 			terrainVertices[i++] = x;
 			terrainVertices[i++] = 0.0f;
 			terrainVertices[i++] = z;
-			i++;
-			i++;
+			// texture
+			terrainVertices[i++] = (x % 2 == 0) ? 0.0f : 1.0f;
+			terrainVertices[i++] = 1.0f;
 
+			// position
 			terrainVertices[i++] = x;
 			terrainVertices[i++] = 0.0f;
 			terrainVertices[i++] = z + 1;
-			i++;
-			i++;
+			// texture
+			terrainVertices[i++] = (x % 2 == 0) ? 0.0f : 1.0f;
+			terrainVertices[i++] = 0.0f;
 		}
 	}
 
@@ -104,8 +108,8 @@ int main() {
 	glEnableVertexAttribArray(0);
 	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 	//glEnableVertexAttribArray(1);
-	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-	//glEnableVertexAttribArray(2);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -123,9 +127,9 @@ int main() {
 		do_movement();
 
 		// render
-		glClearColor(0.0f, 0.3f, 0.9f, 1.0f);
+		glClearColor(0.5f, 0.7f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 		// use shader
 		terrainShader.Use();
