@@ -74,10 +74,10 @@ int main() {
 	//load textures
 	GLuint grassTexture = loadTexture("grass.jpg");
 
-	GLfloat terrainVertices[cols*rows*5];
+	GLfloat terrainVertices[cols*rows*5*2];
 	int i = 0;
-	for (int z = 0; z < 100; z++) {
-		for (int x = 0; x < 100; x += 2) {
+	for (int z = 0; z < cols; z++) {
+		for (int x = 0; x < rows; x++) {
 			terrainVertices[i++] = x;
 			terrainVertices[i++] = 0.0f;
 			terrainVertices[i++] = z;
@@ -150,7 +150,7 @@ int main() {
 		// draw
 		for (int i = 0; i < cols; i++) {
 			glBindVertexArray(VAO);
-			glDrawArrays(GL_TRIANGLE_STRIP, i*100, 100);
+			glDrawArrays(GL_TRIANGLE_STRIP, i*200, 200);
 			glBindVertexArray(0);
 		}
 
