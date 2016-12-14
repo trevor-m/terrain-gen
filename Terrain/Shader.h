@@ -1,5 +1,7 @@
 #ifndef SHADER_H
 #define SHADER_H
+// This is from the tutorials at http://www.learnopengl.com/
+// It abstracts the details of setting up a shader
 
 #include <string>
 #include <fstream>
