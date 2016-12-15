@@ -26,7 +26,7 @@ GLuint loadTexture(GLchar* path);
 const GLuint WIDTH = 1800, HEIGHT = 1200;
 
 // camera
-Camera camera(glm::vec3(0.0f, 5.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 10.0f, 3.0f));
 // input
 bool keys[1024];
 bool firstMouse = true;
@@ -36,7 +36,10 @@ GLfloat lastFrame = 0.0f;
 
 // terrain params
 const int cols = 200, rows = 200;
-double dist = 25.0;
+double dist = 20.0;
+double heightScale = 20;
+double heightOffset = -8;
+GLfloat waterHeight = 0.0f;
 
 
 int main() {
@@ -74,9 +77,10 @@ int main() {
 
 	// load textures
 	GLuint grassTexture = loadTexture("grass.jpg");
+	GLuint sandTexture = loadTexture("sand.jpg");
 
 	// generate terrain
-	PerlinNoise noise;
+	PerlinNoise noise(237);
 	int bufferSize = cols*rows * 5 * 2;
 	GLfloat* terrainVertices = new GLfloat[bufferSize];
 	int i = 0;
@@ -84,7 +88,7 @@ int main() {
 		for (int x = 0; x < rows; x++) {
 			// position
 			terrainVertices[i++] = x;
-			terrainVertices[i++] = 20*noise.noise(x/dist, z/dist, 0.8) - 10;
+			terrainVertices[i++] = heightScale*noise.noise(x/dist, z/dist, 0.8) + heightOffset;
 			terrainVertices[i++] = z;
 			// texture
 			terrainVertices[i++] = (x % 2 == 0) ? 0.0f : 1.0f;
@@ -92,7 +96,7 @@ int main() {
 
 			// position
 			terrainVertices[i++] = x;
-			terrainVertices[i++] = 20*noise.noise(x/ dist, (z+1)/ dist, 0.8) - 10;
+			terrainVertices[i++] = heightScale*noise.noise(x/ dist, (z+1)/ dist, 0.8) + heightOffset;
 			terrainVertices[i++] = z + 1;
 			// texture
 			terrainVertices[i++] = (x % 2 == 0) ? 0.0f : 1.0f;
@@ -119,6 +123,7 @@ int main() {
 
 	// set shader 'constants'
 	terrainShader.Use();
+	glUniform1f(glGetUniformLocation(terrainShader.Program, "waterHeight"), waterHeight);
 
 	// game loop
 	while (!glfwWindowShouldClose(window)) {
@@ -154,6 +159,10 @@ int main() {
 		// bind texture
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, grassTexture);
+		glUniform1i(glGetUniformLocation(terrainShader.Program, "grassTexture"), 0);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, sandTexture);
+		glUniform1i(glGetUniformLocation(terrainShader.Program, "sandTexture"), 1);
 
 		// draw
 		for (int i = 0; i < cols; i++) {
