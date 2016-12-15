@@ -81,7 +81,7 @@ int main() {
 
 	// generate terrain
 	PerlinNoise noise(237);
-	int bufferSize = cols*rows * 5 * 2;
+	int bufferSize = cols*rows * 8 * 2;
 	GLfloat* terrainVertices = new GLfloat[bufferSize];
 	int i = 0;
 	for (int z = 0; z < cols; z++) {
@@ -93,6 +93,8 @@ int main() {
 			// texture
 			terrainVertices[i++] = (x % 2 == 0) ? 0.0f : 1.0f;
 			terrainVertices[i++] = 1.0f;
+			// normal
+			i += 3;
 
 			// position
 			terrainVertices[i++] = x;
@@ -101,6 +103,44 @@ int main() {
 			// texture
 			terrainVertices[i++] = (x % 2 == 0) ? 0.0f : 1.0f;
 			terrainVertices[i++] = 0.0f;
+			i += 3;
+		}
+	}
+
+	// calculate normals
+	i = 0;
+	for (int z = 0; z < cols; z++) {
+		for (int x = 0; x < rows; x+=2) {
+			// each 4 vertices
+			glm::vec3 p1(terrainVertices[i + 8 * 0 + 0], terrainVertices[i + 8 * 0 + 1], terrainVertices[i + 8 * 0 + 2]);
+			glm::vec3 p2(terrainVertices[i + 8 * 1 + 0], terrainVertices[i + 8 * 1 + 1], terrainVertices[i + 8 * 1 + 2]);
+			glm::vec3 p3(terrainVertices[i + 8 * 2 + 0], terrainVertices[i + 8 * 2 + 1], terrainVertices[i + 8 * 2 + 2]);
+			glm::vec3 p4(terrainVertices[i + 8 * 3 + 0], terrainVertices[i + 8 * 3 + 1], terrainVertices[i + 8 * 3 + 2]);
+
+			// first triangle
+			glm::vec3 norm1 = glm::cross(p2 - p1, p3 - p1);
+			// second triangle
+			glm::vec3 norm2 = glm::cross(p3 - p4, p2 - p4);
+
+			i += 5;
+			terrainVertices[i++] = norm1.x;
+			terrainVertices[i++] = norm1.y;
+			terrainVertices[i++] = norm1.z;
+
+			i += 5;
+			terrainVertices[i++] = (norm1.x + norm2.x) / 2.0f;
+			terrainVertices[i++] = (norm1.y + norm2.y) / 2.0f;
+			terrainVertices[i++] = (norm1.z + norm2.z) / 2.0f;
+
+			i += 5;
+			terrainVertices[i++] = (norm2.x + norm1.x) / 2.0f;
+			terrainVertices[i++] = (norm2.y + norm1.y) / 2.0f;
+			terrainVertices[i++] = (norm2.z + norm1.z) / 2.0f;
+
+			i += 5;
+			terrainVertices[i++] = norm2.x;
+			terrainVertices[i++] = norm2.y;
+			terrainVertices[i++] = norm2.z;
 		}
 	}
 
@@ -108,22 +148,30 @@ int main() {
 	GLuint VBO, VAO;
 	glGenBuffers(1, &VBO);
 	glGenVertexArrays(1, &VAO);
-	// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
+
+	// set VAO and VBO data
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, bufferSize * sizeof(GLfloat), terrainVertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+	// position
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-	//glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	// texture coords
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
+	// normals
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
 	// set shader 'constants'
 	terrainShader.Use();
 	glUniform1f(glGetUniformLocation(terrainShader.Program, "waterHeight"), waterHeight);
+	glUniform3f(glGetUniformLocation(terrainShader.Program, "sun.direction"), -0.2f, -1.0f, -0.3f);
+	glUniform3f(glGetUniformLocation(terrainShader.Program, "sun.ambient"), 0.05f, 0.05f, 0.05f);
+	glUniform3f(glGetUniformLocation(terrainShader.Program, "sun.diffuse"), 0.8f, 0.8f, 0.8f);
+	//glUniform3f(glGetUniformLocation(lightingShader.Program, "sun.specular"), 0.5f, 0.5f, 0.5f);
 
 	// game loop
 	while (!glfwWindowShouldClose(window)) {
@@ -154,9 +202,8 @@ int main() {
 		glm::mat4 model;
 		model = glm::translate(model, glm::vec3(-cols/2, 0.0f, -rows/2));
 		glUniformMatrix4fv(glGetUniformLocation(terrainShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		//glUniform3f(glGetUniformLocation(myShader.Program, "viewPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 
-		// bind texture
+		// bind textures
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, grassTexture);
 		glUniform1i(glGetUniformLocation(terrainShader.Program, "grassTexture"), 0);
@@ -181,6 +228,8 @@ int main() {
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
 	glDeleteTextures(1, &grassTexture);
+	glDeleteTextures(1, &sandTexture);
+
 	// exit
 	glfwTerminate();
 	return 0;
