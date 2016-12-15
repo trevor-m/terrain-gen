@@ -94,7 +94,9 @@ int main() {
 			terrainVertices[i++] = (x % 2 == 0) ? 0.0f : 1.0f;
 			terrainVertices[i++] = 1.0f;
 			// normal
-			i += 3;
+			terrainVertices[i++] = 0.0f;
+			terrainVertices[i++] = 0.0f;
+			terrainVertices[i++] = 0.0f;
 
 			// position
 			terrainVertices[i++] = x;
@@ -103,44 +105,41 @@ int main() {
 			// texture
 			terrainVertices[i++] = (x % 2 == 0) ? 0.0f : 1.0f;
 			terrainVertices[i++] = 0.0f;
-			i += 3;
+			// normal
+			terrainVertices[i++] = 0.0f;
+			terrainVertices[i++] = 0.0f;
+			terrainVertices[i++] = 0.0f;
 		}
 	}
 
 	// calculate normals
-	i = 0;
+	double step = 0.1;
+	glm::vec3 normals[cols][rows];
 	for (int z = 0; z < cols; z++) {
-		for (int x = 0; x < rows; x+=2) {
-			// each 4 vertices
-			glm::vec3 p1(terrainVertices[i + 8 * 0 + 0], terrainVertices[i + 8 * 0 + 1], terrainVertices[i + 8 * 0 + 2]);
-			glm::vec3 p2(terrainVertices[i + 8 * 1 + 0], terrainVertices[i + 8 * 1 + 1], terrainVertices[i + 8 * 1 + 2]);
-			glm::vec3 p3(terrainVertices[i + 8 * 2 + 0], terrainVertices[i + 8 * 2 + 1], terrainVertices[i + 8 * 2 + 2]);
-			glm::vec3 p4(terrainVertices[i + 8 * 3 + 0], terrainVertices[i + 8 * 3 + 1], terrainVertices[i + 8 * 3 + 2]);
+		for (int x = 0; x < rows; x++) {
+			double y = heightScale*noise.noise(x / dist, z / dist, 0.8) + heightOffset;
+			//double dxdy = (x - (x - 0.1)) / (y - noise.noise((x - 0.1) / dist, z, 0.8));
+			//double dzdy = (z - (z - 0.1)) / (y - noise.noise(x, (z - 0.1) / dist, 0.8));
+			double newY = heightScale*noise.noise((x - step) / dist, z / dist, 0.8) + heightOffset;
+			glm::vec3 dxdy = glm::vec3(step, newY-y, 0);
+			newY = heightScale*noise.noise(x / dist, (z - step) / dist, 0.8) + heightOffset;
+			glm::vec3 dzdy = glm::vec3(0, newY-y, step);
 
-			// first triangle
-			glm::vec3 norm1 = glm::cross(p2 - p1, p3 - p1);
-			// second triangle
-			glm::vec3 norm2 = glm::cross(p3 - p4, p2 - p4);
-
+			normals[z][x] = glm::normalize(glm::cross(dzdy, dxdy));
+		}
+	}
+	//apply normals
+	i = 0;
+	for (int z = 0; z < cols-1; z++) {
+		for (int x = 0; x < rows; x++) {
 			i += 5;
-			terrainVertices[i++] = norm1.x;
-			terrainVertices[i++] = norm1.y;
-			terrainVertices[i++] = norm1.z;
-
+			terrainVertices[i++] = normals[z][x].x;
+			terrainVertices[i++] = normals[z][x].y;
+			terrainVertices[i++] = normals[z][x].z;
 			i += 5;
-			terrainVertices[i++] = (norm1.x + norm2.x) / 2.0f;
-			terrainVertices[i++] = (norm1.y + norm2.y) / 2.0f;
-			terrainVertices[i++] = (norm1.z + norm2.z) / 2.0f;
-
-			i += 5;
-			terrainVertices[i++] = (norm2.x + norm1.x) / 2.0f;
-			terrainVertices[i++] = (norm2.y + norm1.y) / 2.0f;
-			terrainVertices[i++] = (norm2.z + norm1.z) / 2.0f;
-
-			i += 5;
-			terrainVertices[i++] = norm2.x;
-			terrainVertices[i++] = norm2.y;
-			terrainVertices[i++] = norm2.z;
+			terrainVertices[i++] = normals[z+1][x].x;
+			terrainVertices[i++] = normals[z+1][x].y;
+			terrainVertices[i++] = normals[z+1][x].z;
 		}
 	}
 
