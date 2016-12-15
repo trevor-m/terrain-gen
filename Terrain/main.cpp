@@ -9,6 +9,7 @@
 #include <SOIL.h>
 #include "Shader.h"
 #include "Camera.h"
+#include "PerlinNoise.h"
 
 // callback functions
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -34,8 +35,8 @@ GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
 
 // terrain params
-const int cols = 100, rows = 100;
-float scale = 1.0f;
+const int cols = 200, rows = 200;
+double dist = 25.0;
 
 
 int main() {
@@ -71,16 +72,19 @@ int main() {
 	// load shaders
 	Shader terrainShader("terrainShader.vert", "terrainShader.frag");
 
-	//load textures
+	// load textures
 	GLuint grassTexture = loadTexture("grass.jpg");
 
-	GLfloat terrainVertices[cols*rows*5*2];
+	// generate terrain
+	PerlinNoise noise;
+	int bufferSize = cols*rows * 5 * 2;
+	GLfloat* terrainVertices = new GLfloat[bufferSize];
 	int i = 0;
 	for (int z = 0; z < cols; z++) {
 		for (int x = 0; x < rows; x++) {
 			// position
 			terrainVertices[i++] = x;
-			terrainVertices[i++] = 0.0f;
+			terrainVertices[i++] = 20*noise.noise(x/dist, z/dist, 0.8) - 10;
 			terrainVertices[i++] = z;
 			// texture
 			terrainVertices[i++] = (x % 2 == 0) ? 0.0f : 1.0f;
@@ -88,7 +92,7 @@ int main() {
 
 			// position
 			terrainVertices[i++] = x;
-			terrainVertices[i++] = 0.0f;
+			terrainVertices[i++] = 20*noise.noise(x/ dist, (z+1)/ dist, 0.8) - 10;
 			terrainVertices[i++] = z + 1;
 			// texture
 			terrainVertices[i++] = (x % 2 == 0) ? 0.0f : 1.0f;
@@ -103,7 +107,7 @@ int main() {
 	// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(terrainVertices), terrainVertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, bufferSize * sizeof(GLfloat), terrainVertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
@@ -154,7 +158,7 @@ int main() {
 		// draw
 		for (int i = 0; i < cols; i++) {
 			glBindVertexArray(VAO);
-			glDrawArrays(GL_TRIANGLE_STRIP, i*200, 200);
+			glDrawArrays(GL_TRIANGLE_STRIP, i * rows * 2, rows*2);
 			glBindVertexArray(0);
 		}
 
@@ -162,10 +166,12 @@ int main() {
 		glfwSwapBuffers(window);
 
 	}
-
+	
 	// deallocate
+	delete[] terrainVertices;
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
+	glDeleteTextures(1, &grassTexture);
 	// exit
 	glfwTerminate();
 	return 0;
