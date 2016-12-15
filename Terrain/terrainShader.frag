@@ -17,6 +17,7 @@ uniform sampler2D grassTexture;
 uniform sampler2D sandTexture;
 uniform float waterHeight;
 uniform DirectionalLight sun;
+uniform vec3 viewPos;
 
 const float waterFade = 1.0;
 
@@ -39,6 +40,11 @@ void main()
 	vec3 lightDir = normalize(-sun.direction);
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuse = sun.diffuse * diff * vec3(currentColor);
+	//specular
+	vec3 viewDir = normalize(viewPos - vec3(Position));
+	vec3 reflectDir = reflect(-lightDir, norm);
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 4);
+	vec3 specular = sun.specular * spec * vec3(currentColor);  
 
-	color = vec4(ambient + diffuse, 1.0f);
+	color = vec4(ambient + diffuse + specular, 1.0f);
 }

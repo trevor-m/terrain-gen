@@ -170,7 +170,7 @@ int main() {
 	glUniform3f(glGetUniformLocation(terrainShader.Program, "sun.direction"), -0.2f, -1.0f, -0.3f);
 	glUniform3f(glGetUniformLocation(terrainShader.Program, "sun.ambient"), 0.05f, 0.05f, 0.05f);
 	glUniform3f(glGetUniformLocation(terrainShader.Program, "sun.diffuse"), 0.8f, 0.8f, 0.8f);
-	//glUniform3f(glGetUniformLocation(lightingShader.Program, "sun.specular"), 0.5f, 0.5f, 0.5f);
+	glUniform3f(glGetUniformLocation(terrainShader.Program, "sun.specular"), 0.5f, 0.5f, 0.5f);
 
 	// game loop
 	while (!glfwWindowShouldClose(window)) {
@@ -189,15 +189,16 @@ int main() {
 
 		// use shader
 		terrainShader.Use();
-		// view
+		glUniform3f(glGetUniformLocation(terrainShader.Program, "viewPos"), camera.Position.x, camera.Position.y, camera.Position.z);
+		// view matrix
 		glm::mat4 view;
 		view = camera.GetViewMatrix();
 		glUniformMatrix4fv(glGetUniformLocation(terrainShader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-		// projection
+		// projection matrix
 		glm::mat4 projection;
 		projection = glm::perspective(glm::radians(camera.Zoom), WIDTH / (float)HEIGHT, 0.1f, 100.0f);
 		glUniformMatrix4fv(glGetUniformLocation(terrainShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		// model
+		// model matrix
 		glm::mat4 model;
 		model = glm::translate(model, glm::vec3(-cols/2, 0.0f, -rows/2));
 		glUniformMatrix4fv(glGetUniformLocation(terrainShader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
