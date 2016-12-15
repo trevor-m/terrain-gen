@@ -118,13 +118,17 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PerlinNoise.cpp" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="TerrainRenderer.cpp" />
+    <ClCompile Include="WaterRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="PerlinNoise.h" />
+    <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="TerrainRenderer.h" />
+    <ClInclude Include="WaterRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="terrainShader.frag" />
