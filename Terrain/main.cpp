@@ -112,7 +112,7 @@ int main() {
 
 		glDisable(GL_CLIP_DISTANCE0);
 		terrain.Render(camera, glm::vec4(0.0f, 1.0f, 0.0f, 10000.0f));
-		water.Render(camera);
+		water.Render(camera, deltaTime);
 
 		// swap buffers
 		glfwSwapBuffers(window);

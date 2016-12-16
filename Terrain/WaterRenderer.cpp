@@ -3,6 +3,11 @@
 WaterRenderer::WaterRenderer(GLuint WIDTH, GLuint HEIGHT, int cols, int rows, GLfloat waterHeight)
 	: shader("waterShader.vert", "waterShader.frag"), Renderer(WIDTH, HEIGHT)
 {
+	waveSpeed = 0.03f;
+	waveMoveFactor = 0;
+	dudvMap = loadTexture("waterDUDV.png");
+	normalMap = loadTexture("waterNormaL.png");
+
 	//create framebuffers
 	glGenFramebuffers(1, &reflectionFBO);
 	glGenFramebuffers(1, &refractionFBO);
@@ -68,6 +73,8 @@ WaterRenderer::~WaterRenderer()
 	glDeleteTextures(1, &reflectionDepthTexture);
 	glDeleteTextures(1, &refractionTexture);
 	glDeleteTextures(1, &refractionDepthTexture);
+	glDeleteTextures(1, &normalMap);
+	glDeleteTextures(1, &dudvMap);
 }
 
 void WaterRenderer::generate(GLfloat waterHeight)
@@ -113,9 +120,12 @@ void WaterRenderer::generate(GLfloat waterHeight)
 	glBindVertexArray(0);
 }
 
-void WaterRenderer::Render(Camera& camera) {
+void WaterRenderer::Render(Camera& camera, GLfloat deltaTime) {
 	// use shader
 	shader.Use();
+	waveMoveFactor += waveSpeed * deltaTime;
+	waveMoveFactor = std::fmod(waveMoveFactor, 1.0);
+	glUniform1f(glGetUniformLocation(shader.Program, "waveMoveFactor"), waveMoveFactor);
 	glUniform3f(glGetUniformLocation(shader.Program, "viewPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 	// view matrix
 	glm::mat4 view;
@@ -139,6 +149,12 @@ void WaterRenderer::Render(Camera& camera) {
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, refractionTexture);
 	glUniform1i(glGetUniformLocation(shader.Program, "refractionTexture"), 1);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, dudvMap);
+	glUniform1i(glGetUniformLocation(shader.Program, "dudvMap"), 2);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, normalMap);
+	glUniform1i(glGetUniformLocation(shader.Program, "normalMap"), 3);
 
 	// draw
 	glBindVertexArray(VAO);
