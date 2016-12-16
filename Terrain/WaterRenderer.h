@@ -24,6 +24,7 @@ public:
 	WaterRenderer(GLuint WIDTH, GLuint HEIGHT, int cols, int rows, GLfloat waterHeight);
 	~WaterRenderer();
 
+	//void PrepareRender();
 	void Render(Camera& camera, GLfloat deltaTime);
 
 	void BindReflectionBuffer();

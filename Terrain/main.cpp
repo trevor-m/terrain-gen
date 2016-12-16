@@ -76,7 +76,7 @@ int main() {
 	//glGenFramebuffers(1, &refractionFBO);
 	//glBindFramebuffer(GL_FRAMEBUFFER, reflectionFBO);
 
-	
+	//glDepthRange(0.1, 10000);
 
 	// game loop
 	while (!glfwWindowShouldClose(window)) {
@@ -92,7 +92,7 @@ int main() {
 		glEnable(GL_CLIP_DISTANCE0);
 
 		// render
-		glClearColor(0.5f, 0.7f, 1.0f, 1.0f);
+		glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		terrain.PrepareRender(waterHeight);
@@ -101,7 +101,7 @@ int main() {
 		float distance = 2 * (camera.Position.y - waterHeight);
 		camera.Position.y -= distance;
 		camera.InvertPitch();
-		terrain.Render(camera, glm::vec4(0.0f, 1.0f, 0.0f, -waterHeight));
+		terrain.Render(camera, glm::vec4(0.0f, 1.0f, 0.0f, -waterHeight+1.0f));
 		camera.Position.y += distance;
 		camera.InvertPitch();
 		water.UnbindBuffer();

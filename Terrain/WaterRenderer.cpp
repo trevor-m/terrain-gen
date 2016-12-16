@@ -49,9 +49,9 @@ WaterRenderer::WaterRenderer(GLuint WIDTH, GLuint HEIGHT, int cols, int rows, GL
 	//depth
 	glGenTextures(1, &refractionDepthTexture);
 	glBindTexture(GL_TEXTURE_2D, refractionDepthTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, WIDTH, HEIGHT, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, WIDTH, HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
@@ -120,9 +120,15 @@ void WaterRenderer::generate(GLfloat waterHeight)
 	glBindVertexArray(0);
 }
 
-void WaterRenderer::Render(Camera& camera, GLfloat deltaTime) {
+void WaterRenderer::Render(Camera& camera, GLfloat deltaTime)
+{
 	// use shader
 	shader.Use();
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glUniform3f(glGetUniformLocation(shader.Program, "sun.direction"), -0.2f, -1.0f, -0.3f);
+	glUniform3f(glGetUniformLocation(shader.Program, "sun.specular"), 0.5f, 0.5f, 0.5f);
+
 	waveMoveFactor += waveSpeed * deltaTime;
 	waveMoveFactor = std::fmod(waveMoveFactor, 1.0);
 	glUniform1f(glGetUniformLocation(shader.Program, "waveMoveFactor"), waveMoveFactor);
@@ -133,7 +139,7 @@ void WaterRenderer::Render(Camera& camera, GLfloat deltaTime) {
 	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	// projection matrix
 	glm::mat4 projection;
-	projection = glm::perspective(glm::radians(camera.Zoom), WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(camera.Zoom), WIDTH / (float)HEIGHT, 0.1f, 1000.0f);
 	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	// model matrix
 	glm::mat4 model;
@@ -155,18 +161,23 @@ void WaterRenderer::Render(Camera& camera, GLfloat deltaTime) {
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, normalMap);
 	glUniform1i(glGetUniformLocation(shader.Program, "normalMap"), 3);
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, refractionDepthTexture);
+	glUniform1i(glGetUniformLocation(shader.Program, "depthMap"), 4);
 
 	// draw
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
+
+	glDisable(GL_BLEND);
 }
 
 void WaterRenderer::BindReflectionBuffer()
 {
-	glBindTexture(GL_TEXTURE_2D, 0); //?
+	//glBindTexture(GL_TEXTURE_2D, 0); //?
 	glBindFramebuffer(GL_FRAMEBUFFER, reflectionFBO);
-	glClearColor(0.5f, 0.7f, 1.0f, 1.0f);
+	glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	//viewport
@@ -174,9 +185,9 @@ void WaterRenderer::BindReflectionBuffer()
 
 void WaterRenderer::BindRefractionBuffer()
 {
-	glBindTexture(GL_TEXTURE_2D, 0);
+	//glBindTexture(GL_TEXTURE_2D, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, refractionFBO);
-	glClearColor(0.5f, 0.7f, 1.0f, 1.0f);
+	glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	//viewport

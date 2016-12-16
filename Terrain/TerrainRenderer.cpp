@@ -134,7 +134,7 @@ void TerrainRenderer::Render(Camera& camera, glm::vec4 clipPlane) {
 	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	// projection matrix
 	glm::mat4 projection;
-	projection = glm::perspective(glm::radians(camera.Zoom), WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(camera.Zoom), WIDTH / (float)HEIGHT, 0.1f, 1000.0f);
 	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	// model matrix
 	glm::mat4 model;

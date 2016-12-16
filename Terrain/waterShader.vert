@@ -8,7 +8,7 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-const float tiling = 6.0;
+const float tiling = 10.0;
 
 void main()
 {
