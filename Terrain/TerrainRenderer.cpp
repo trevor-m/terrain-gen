@@ -29,7 +29,7 @@ void TerrainRenderer::generate() {
 
 	double dist = 20.0;
 	double heightScale = 20;
-	double heightOffset = -8;
+	double heightOffset = -9;
 	bufferSize = cols*rows * 8 * 2;
 	terrainVertices = new GLfloat[bufferSize];
 	int i = 0;

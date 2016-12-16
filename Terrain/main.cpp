@@ -9,6 +9,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "TerrainRenderer.h"
+#include "WaterRenderer.h"
 
 
 // callback functions
@@ -60,11 +61,14 @@ int main() {
 	// disable cursor
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	// generate terrain
-	TerrainRenderer terrain(WIDTH, HEIGHT);
-
 	// terrain params
 	GLfloat waterHeight = 0.0f;
+
+	// generate terrain
+	TerrainRenderer terrain(WIDTH, HEIGHT);
+	WaterRenderer water(WIDTH, HEIGHT, 200, 200, waterHeight);
+
+
 	
 	// water
 	//GLuint reflectionFBO, refractionFBO;
@@ -92,6 +96,7 @@ int main() {
 		
 		terrain.PrepareRender(waterHeight);
 		terrain.Render(camera);
+		water.Render(camera);
 
 		// swap buffers
 		glfwSwapBuffers(window);

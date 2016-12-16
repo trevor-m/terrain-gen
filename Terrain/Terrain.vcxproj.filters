@@ -58,5 +58,11 @@
     <None Include="terrainShader.vert">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="waterShader.frag">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="waterShader.vert">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
