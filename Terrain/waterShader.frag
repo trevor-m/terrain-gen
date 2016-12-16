@@ -14,9 +14,11 @@ struct DirectionalLight {
 
 uniform sampler2D reflectionTexture;
 uniform sampler2D refractionTexture;
+uniform sampler2D dudvMap;
+uniform sampler2D normalMap;
 uniform float waterHeight;
-uniform DirectionalLight sun;
-uniform vec3 viewPos;
+//uniform DirectionalLight sun;
+//uniform vec3 viewPos;
 
 const float waterFade = 1.0;
 

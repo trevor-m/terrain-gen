@@ -9,7 +9,7 @@ private:
 	Shader shader;
 	GLuint VBO, VAO;
 	GLuint reflectionFBO, refractionFBO;
-	GLuint reflectionTexture, refractionTexture, refractionDepthTexture;
+	GLuint reflectionTexture, reflectionDepthTexture, refractionTexture, refractionDepthTexture;
 
 	GLfloat vertices[6*3];
 	int cols, rows;
