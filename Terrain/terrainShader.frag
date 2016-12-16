@@ -25,10 +25,10 @@ void main()
 {
 	// mix between sand and grass
 	vec4 currentColor;
-	if (Position.y < waterHeight - waterFade)
+	if (Position.y < waterHeight)
 		currentColor = texture(sandTexture, TexCoords);
-	else if (Position.y < waterHeight)
-		currentColor = mix(texture(grassTexture, TexCoords), texture(sandTexture, TexCoords), waterHeight - Position.y);
+	else if (Position.y < waterHeight + waterFade)
+		currentColor = mix( texture(sandTexture, TexCoords), texture(grassTexture, TexCoords), Position.y - waterHeight);
 	else
 		currentColor = texture(grassTexture, TexCoords);
 
