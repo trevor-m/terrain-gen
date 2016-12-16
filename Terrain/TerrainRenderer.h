@@ -21,6 +21,6 @@ public:
 	~TerrainRenderer();
 
 	void PrepareRender(GLfloat waterHeight);
-	void Render(Camera& camera);
+	void Render(Camera& camera, glm::vec4 clipPlane);
 };
 

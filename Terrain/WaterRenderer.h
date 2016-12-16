@@ -8,15 +8,22 @@ class WaterRenderer : public Renderer
 private:
 	Shader shader;
 	GLuint VBO, VAO;
+	GLuint reflectionFBO, refractionFBO;
+	GLuint reflectionTexture, refractionTexture, refractionDepthTexture;
 
 	GLfloat vertices[6*3];
+	int cols, rows;
 
 	//GLuint dudvMap, normalMap;
-	void generate(int cols, int rows, GLfloat waterHeight);
+	void generate(GLfloat waterHeight);
 public:
 	WaterRenderer(GLuint WIDTH, GLuint HEIGHT, int cols, int rows, GLfloat waterHeight);
 	~WaterRenderer();
 
 	void Render(Camera& camera);
+
+	void BindReflectionBuffer();
+	void BindRefractionBuffer();
+	void UnbindBuffer();
 };
 

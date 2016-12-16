@@ -11,9 +11,13 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+uniform vec4 clipPlane;
+
 void main()
 {
 	Position = model * vec4(position, 1.0f);
+	gl_ClipDistance[0] = dot(Position, clipPlane);
+
     gl_Position = projection * view * Position;
     TexCoords = texCoords;
 	Normal = normal; //mat3(transpose(inverse(model))) * normal;

@@ -123,9 +123,10 @@ void TerrainRenderer::PrepareRender(GLfloat waterHeight) {
 	glUniform3f(glGetUniformLocation(shader.Program, "sun.specular"), 0.5f, 0.5f, 0.5f);
 }
 
-void TerrainRenderer::Render(Camera& camera) {
+void TerrainRenderer::Render(Camera& camera, glm::vec4 clipPlane) {
 	// use shader
 	shader.Use();
+	glUniform4f(glGetUniformLocation(shader.Program, "clipPlane"), clipPlane.x, clipPlane.y, clipPlane.z, clipPlane.w);
 	glUniform3f(glGetUniformLocation(shader.Program, "viewPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 	// view matrix
 	glm::mat4 view;

@@ -3,38 +3,88 @@
 WaterRenderer::WaterRenderer(GLuint WIDTH, GLuint HEIGHT, int cols, int rows, GLfloat waterHeight)
 	: shader("waterShader.vert", "waterShader.frag"), Renderer(WIDTH, HEIGHT)
 {
-	generate(cols, rows, waterHeight);
+	//create framebuffers
+	glGenFramebuffers(1, &reflectionFBO);
+	glGenFramebuffers(1, &refractionFBO);
+
+	//set up reflection
+	glBindFramebuffer(GL_FRAMEBUFFER, reflectionFBO);
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+	//color
+	glGenTextures(1, &reflectionTexture);
+	glBindTexture(GL_TEXTURE_2D, reflectionTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WIDTH, HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, reflectionTexture, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "ERROR::FRAMEBUFFER:: Reflection Framebuffer is not complete!" << std::endl;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//set up refraction
+	glBindFramebuffer(GL_FRAMEBUFFER, refractionFBO);
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+	//color
+	glGenTextures(1, &refractionTexture);
+	glBindTexture(GL_TEXTURE_2D, refractionTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WIDTH, HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, refractionTexture, 0);
+	//depth
+	glGenTextures(1, &refractionDepthTexture);
+	glBindTexture(GL_TEXTURE_2D, refractionDepthTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, WIDTH, HEIGHT, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, refractionDepthTexture, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "ERROR::FRAMEBUFFER:: Refraction Framebuffer is not complete!" << std::endl;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	generate(waterHeight);
+	this->cols = cols;
+	this->rows = rows;
 }
 
 WaterRenderer::~WaterRenderer()
 {
+	glDeleteFramebuffers(1, &reflectionFBO);
+	glDeleteFramebuffers(1, &refractionFBO);
+	glDeleteTextures(1, &reflectionTexture);
+	glDeleteTextures(1, &refractionTexture);
+	glDeleteTextures(1, &refractionDepthTexture);
 }
 
-void WaterRenderer::generate(int cols, int rows, GLfloat waterHeight)
+void WaterRenderer::generate(GLfloat waterHeight)
 {
-	vertices[0] = -rows / 2;
-	vertices[1] = waterHeight;
-	vertices[2] = -cols / 2;
+	int i = 0;
+	vertices[i++] = -1.0f;
+	vertices[i++] = waterHeight;
+	vertices[i++] = -1.0f;
 
-	vertices[3] = rows / 2;
-	vertices[4] = waterHeight;
-	vertices[5] = -cols / 2;
+	vertices[i++] = -1.0f;
+	vertices[i++] = waterHeight;
+	vertices[i++] = 1.0f;
 
-	vertices[6] = -rows / 2;
-	vertices[7] = waterHeight;
-	vertices[8] = cols / 2;
+	vertices[i++] = 1.0f;
+	vertices[i++] = waterHeight;
+	vertices[i++] = -1.0f;
 
-	vertices[9] = rows / 2;
-	vertices[10] = waterHeight;
-	vertices[11] = cols / 2;
+	vertices[i++] = 1.0f;
+	vertices[i++] = waterHeight;
+	vertices[i++] = -1.0f;
 
-	vertices[12] = -rows / 2;
-	vertices[13] = waterHeight;
-	vertices[14] = cols / 2;
+	vertices[i++] = -1.0f;
+	vertices[i++] = waterHeight;
+	vertices[i++] = 1.0f;
 
-	vertices[15] = rows / 2;
-	vertices[16] = waterHeight;
-	vertices[17] = -cols / 2;
+	vertices[i++] = 1.0f;
+	vertices[i++] = waterHeight;
+	vertices[i++] = 1.0f;
 
 	// create buffers for data
 	glGenBuffers(1, &VBO);
@@ -47,6 +97,7 @@ void WaterRenderer::generate(int cols, int rows, GLfloat waterHeight)
 	// position
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
@@ -65,19 +116,47 @@ void WaterRenderer::Render(Camera& camera) {
 	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	// model matrix
 	glm::mat4 model;
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+	//model = glm::translate(model, glm::vec3(0.0f, 5.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(rows/2, 0.0f, cols/2));
+	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 
 	// bind textures
-	/*glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, grassTexture);
-	glUniform1i(glGetUniformLocation(shader.Program, "grassTexture"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, reflectionTexture);
+	glUniform1i(glGetUniformLocation(shader.Program, "reflectionTexture"), 0);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, sandTexture);
-	glUniform1i(glGetUniformLocation(shader.Program, "sandTexture"), 1);*/
+	glBindTexture(GL_TEXTURE_2D, refractionTexture);
+	glUniform1i(glGetUniformLocation(shader.Program, "refractionTexture"), 1);
 
 	// draw
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
+}
+
+void WaterRenderer::BindReflectionBuffer()
+{
+	glBindTexture(GL_TEXTURE_2D, 0); //?
+	glBindFramebuffer(GL_FRAMEBUFFER, reflectionFBO);
+	glClearColor(0.5f, 0.7f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	//viewport
+}
+
+void WaterRenderer::BindRefractionBuffer()
+{
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, refractionFBO);
+	glClearColor(0.5f, 0.7f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	//viewport
+}
+
+void WaterRenderer::UnbindBuffer()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//viewport
 }

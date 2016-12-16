@@ -1,5 +1,6 @@
 #version 330 core
 in vec4 Position;
+in vec4 ClipSpace;
 
 out vec4 color;
 
@@ -11,8 +12,8 @@ struct DirectionalLight {
     vec3 specular;
 };
 
-uniform sampler2D grassTexture;
-uniform sampler2D sandTexture;
+uniform sampler2D reflectionTexture;
+uniform sampler2D refractionTexture;
 uniform float waterHeight;
 uniform DirectionalLight sun;
 uniform vec3 viewPos;
@@ -21,17 +22,8 @@ const float waterFade = 1.0;
 
 void main()
 {
-	// mix between sand and grass
-	/*vec4 currentColor;
-	if (Position.y < waterHeight - waterFade)
-		currentColor = texture(sandTexture, TexCoords);
-	else if (Position.y < waterHeight)
-		currentColor = mix(texture(grassTexture, TexCoords), texture(sandTexture, TexCoords), waterHeight - Position.y);
-	else
-		currentColor = texture(grassTexture, TexCoords);
-
 	// lighting
-	//ambient
+	/*//ambient
 	vec3 ambient = sun.ambient * vec3(currentColor);
 	//diffuse
 	vec3 norm = normalize(Normal);
@@ -43,6 +35,16 @@ void main()
 	vec3 reflectDir = reflect(-lightDir, norm);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 4);
 	vec3 specular = sun.specular * spec * vec3(currentColor);  */
+	// vec4(ambient + diffuse + specular, 1.0f);
 
-	color = vec4(0,0,1,1);// vec4(ambient + diffuse + specular, 1.0f);
+
+
+	// normalized device space
+	vec2 ndc = (ClipSpace.xy/ClipSpace.w)/2.0 + 0.5;
+
+	vec4 reflectColor = texture(reflectionTexture, vec2(ndc.x , -ndc.y));
+	vec4 refractColor = texture(refractionTexture, ndc);
+
+	color = mix(reflectColor, refractColor, 0.5);
+	//color = vec4(0,0,1,1);
 }
