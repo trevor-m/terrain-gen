@@ -60,7 +60,7 @@ void main()
 	vec4 refractColor = texture(refractionTexture, refractTexCoords);
 
 	vec4 normalColor = texture(normalMap, distortedTexCoords);
-	vec3 norm = normalize(vec3(normalColor.r * 2.0 - 1.0, normalColor.g*3.0, normalColor.b * 2.0 - 1.0));
+	vec3 norm = normalize(vec3(normalColor.r * 2.0 - 1.0, normalColor.g*2.0, normalColor.b * 2.0 - 1.0));
 	vec3 viewDir = normalize(viewPos - vec3(Position));
 	vec3 reflectDir = reflect(-sun.direction, norm);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
@@ -70,6 +70,6 @@ void main()
 	float refractiveFactor = clamp(pow(dot(viewDir, norm), 0.5), 0.0, 1.0); //change this to make more seethrough/reflective
 
 	color = mix(reflectColor, refractColor, refractiveFactor);
-	color = mix(color, vec4(0,0.3,0.5,1), 0.2) + vec4(specular, 0.0);
+	color = mix(color, vec4(0,0.5,0.8,1), 0.2) + vec4(specular, 0.0);
 	color.a = clamp(waterDepth/2.0, 0.0, 1.0);
 }

@@ -91,6 +91,17 @@ void TerrainRenderer::generate() {
 			terrainVertices[i++] = normals[z + 1][x].z;
 		}
 	}
+	//last row
+	for (int x = 0; x < rows; x++) {
+		i += 5;
+		terrainVertices[i++] = normals[cols - 1][x].x;
+		terrainVertices[i++] = normals[cols - 1][x].y;
+		terrainVertices[i++] = normals[cols - 1][x].z;
+		i += 8;
+		//terrainVertices[i++] = normals[z + 1][x].x;
+		//terrainVertices[i++] = normals[z + 1][x].y;
+		//terrainVertices[i++] = normals[z + 1][x].z;
+	}
 
 	// create buffers for data
 	glGenBuffers(1, &VBO);
