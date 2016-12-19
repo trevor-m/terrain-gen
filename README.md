@@ -1,9 +1,14 @@
 # terrain-gen
 Procedurally generates a terrain using Perlin noise and displays it with OpenGL.
 
+<img width="901" alt="terrain-gen" src="https://cloud.githubusercontent.com/assets/12981474/21300520/822b2ae4-c559-11e6-9352-3f754047a420.png">
+
+
 ### Features
 * Texture mixing
+* Terrain generated with Perlin Noise
 * Lighting (Ambient, Diffuse and Specular)
+* Water - using Frame Buffer Objects to render reflection and refraction to textures and distorted through a dudv map and a normal map.
 
 
 ### Libraries Used
