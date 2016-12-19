@@ -124,19 +124,19 @@ void TerrainRenderer::generate() {
 	glBindVertexArray(0);
 }
 
-void TerrainRenderer::PrepareRender(GLfloat waterHeight) {
-	// set shader 'constants'
+void TerrainRenderer::Render(Camera& camera, glm::vec4 clipPlane, GLfloat waterHeight) {
+	//clear buffer
+	glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+
+	// use shader
 	shader.Use();
 	glUniform1f(glGetUniformLocation(shader.Program, "waterHeight"), waterHeight);
 	glUniform3f(glGetUniformLocation(shader.Program, "sun.direction"), -0.2f, -1.0f, -0.3f);
 	glUniform3f(glGetUniformLocation(shader.Program, "sun.ambient"), 0.05f, 0.05f, 0.05f);
 	glUniform3f(glGetUniformLocation(shader.Program, "sun.diffuse"), 0.8f, 0.8f, 0.8f);
 	glUniform3f(glGetUniformLocation(shader.Program, "sun.specular"), 0.5f, 0.5f, 0.5f);
-}
-
-void TerrainRenderer::Render(Camera& camera, glm::vec4 clipPlane) {
-	// use shader
-	shader.Use();
 	glUniform4f(glGetUniformLocation(shader.Program, "clipPlane"), clipPlane.x, clipPlane.y, clipPlane.z, clipPlane.w);
 	glUniform3f(glGetUniformLocation(shader.Program, "viewPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 	// view matrix

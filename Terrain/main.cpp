@@ -88,30 +88,28 @@ int main() {
 		glfwPollEvents();
 		do_movement();
 		
-
+		// enable clipping for water reflection/refraction
 		glEnable(GL_CLIP_DISTANCE0);
 
-		// render
-		glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		terrain.PrepareRender(waterHeight);
-
+		// render reflection (everything above waterHeight)
 		water.BindReflectionBuffer();
 		float distance = 2 * (camera.Position.y - waterHeight);
 		camera.Position.y -= distance;
 		camera.InvertPitch();
-		terrain.Render(camera, glm::vec4(0.0f, 1.0f, 0.0f, -waterHeight+1.0f));
+		terrain.Render(camera, glm::vec4(0.0f, 1.0f, 0.0f, -waterHeight+0.5f), waterHeight);
 		camera.Position.y += distance;
 		camera.InvertPitch();
 		water.UnbindBuffer();
 
+		// render refraction (everything below waterHeight)
 		water.BindRefractionBuffer();
-		terrain.Render(camera, glm::vec4(0.0f, -1.0f, 0.0f, waterHeight));
+		terrain.Render(camera, glm::vec4(0.0f, -1.0f, 0.0f, waterHeight), waterHeight);
 		water.UnbindBuffer();
 
 		glDisable(GL_CLIP_DISTANCE0);
-		terrain.Render(camera, glm::vec4(0.0f, 1.0f, 0.0f, 10000.0f));
+
+		// render regular scene
+		terrain.Render(camera, glm::vec4(0.0f, 1.0f, 0.0f, 10000.0f), waterHeight);
 		water.Render(camera, deltaTime);
 
 		// swap buffers

@@ -177,9 +177,6 @@ void WaterRenderer::BindReflectionBuffer()
 {
 	//glBindTexture(GL_TEXTURE_2D, 0); //?
 	glBindFramebuffer(GL_FRAMEBUFFER, reflectionFBO);
-	glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
 	//viewport
 }
 
@@ -187,9 +184,6 @@ void WaterRenderer::BindRefractionBuffer()
 {
 	//glBindTexture(GL_TEXTURE_2D, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, refractionFBO);
-	glClearColor(0.7f, 0.8f, 1.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
 	//viewport
 }
 
