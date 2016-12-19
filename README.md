@@ -1,7 +1,7 @@
 # terrain-gen
 Procedurally generates a terrain using Perlin noise and displays it with OpenGL.
 
-<img width="901" alt="terrain-gen" src="https://cloud.githubusercontent.com/assets/12981474/21300520/822b2ae4-c559-11e6-9352-3f754047a420.png">
+<img width="900" alt="terrain-gen" src="https://cloud.githubusercontent.com/assets/12981474/21300633/757424b2-c55a-11e6-98d1-ab0ce533653e.png">
 
 
 ### Features
