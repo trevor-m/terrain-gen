@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <SOIL.h>
+#include <vector>
 
 class Renderer
 {
@@ -12,6 +13,7 @@ protected:
 	GLuint WIDTH, HEIGHT;
 
 	GLuint loadTexture(GLchar* path);
+	GLuint loadCubemap(std::vector<const GLchar*> faces);
 public:
 	Renderer(GLuint WIDTH, GLuint HEIGHT);
 	~Renderer();

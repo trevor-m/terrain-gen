@@ -30,6 +30,9 @@
     <ClCompile Include="Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SkyRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -50,6 +53,9 @@
     <ClInclude Include="Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SkyRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="terrainShader.frag">
@@ -62,6 +68,12 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="waterShader.vert">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="skyShader.frag">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="skyShader.vert">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

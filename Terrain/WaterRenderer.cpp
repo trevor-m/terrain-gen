@@ -5,8 +5,8 @@ WaterRenderer::WaterRenderer(GLuint WIDTH, GLuint HEIGHT, int cols, int rows, GL
 {
 	waveSpeed = 0.03f;
 	waveMoveFactor = 0;
-	dudvMap = loadTexture("waterDUDV.png");
-	normalMap = loadTexture("waterNormaL.png");
+	dudvMap = loadTexture("assets/waterDUDV.png");
+	normalMap = loadTexture("assets/waterNormaL.png");
 
 	//create framebuffers
 	glGenFramebuffers(1, &reflectionFBO);

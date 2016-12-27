@@ -119,6 +119,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PerlinNoise.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="SkyRenderer.cpp" />
     <ClCompile Include="TerrainRenderer.cpp" />
     <ClCompile Include="WaterRenderer.cpp" />
   </ItemGroup>
@@ -127,10 +128,13 @@
     <ClInclude Include="PerlinNoise.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="SkyRenderer.h" />
     <ClInclude Include="TerrainRenderer.h" />
     <ClInclude Include="WaterRenderer.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="skyShader.frag" />
+    <None Include="skyShader.vert" />
     <None Include="terrainShader.frag" />
     <None Include="terrainShader.vert" />
     <None Include="waterShader.frag" />

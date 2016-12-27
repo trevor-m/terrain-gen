@@ -7,8 +7,8 @@ TerrainRenderer::TerrainRenderer(GLuint WIDTH, GLuint HEIGHT)
 {
 
 	// load textures
-	grassTexture = loadTexture("grass.jpg");
-	sandTexture = loadTexture("sand.jpg");
+	grassTexture = loadTexture("assets/grass.jpg");
+	sandTexture = loadTexture("assets/sand.jpg");
 
 	generate();
 }

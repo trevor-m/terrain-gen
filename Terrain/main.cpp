@@ -10,7 +10,7 @@
 #include "Camera.h"
 #include "TerrainRenderer.h"
 #include "WaterRenderer.h"
-
+#include "SkyRenderer.h"
 
 // callback functions
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -68,9 +68,8 @@ int main() {
 	// generate terrain
 	TerrainRenderer terrain(WIDTH, HEIGHT);
 	WaterRenderer water(WIDTH, HEIGHT, 200, 200, waterHeight);
+	SkyRenderer sky(WIDTH, HEIGHT);
 
-
-	
 	// water
 	//GLuint reflectionFBO, refractionFBO;
 	//glGenFramebuffers(1, &reflectionFBO);
@@ -98,6 +97,7 @@ int main() {
 		camera.Position.y -= distance;
 		camera.InvertPitch();
 		terrain.Render(camera, glm::vec4(0.0f, 1.0f, 0.0f, -waterHeight+1.0f), waterHeight);
+		sky.Render(camera);
 		camera.Position.y += distance;
 		camera.InvertPitch();
 		water.UnbindBuffer();
@@ -112,6 +112,7 @@ int main() {
 		// render regular scene
 		terrain.Render(camera, glm::vec4(0.0f, 1.0f, 0.0f, 10000.0f), waterHeight);
 		water.Render(camera, deltaTime);
+		sky.Render(camera);
 
 		// swap buffers
 		glfwSwapBuffers(window);
