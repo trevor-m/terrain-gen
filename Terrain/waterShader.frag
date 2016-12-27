@@ -48,7 +48,7 @@ void main()
 	//get RG values of dudv map
 	vec2 distortedTexCoords = texture(dudvMap, vec2(TexCoords.x + waveMoveFactor, TexCoords.y)).rg*0.1;
 	distortedTexCoords = TexCoords + vec2(distortedTexCoords.x, distortedTexCoords.y+waveMoveFactor);
-	vec2 totalDistortion = (texture(dudvMap, distortedTexCoords).rg * 2.0 - 1.0) * waveStrength * clamp(waterDepth/2.0, 0.0, 1.0);
+	vec2 totalDistortion = (texture(dudvMap, distortedTexCoords).rg * 2.0 - 1.0) * waveStrength * clamp(waterDepth/5.0, 0.0, 1.0);
 
 	reflectTexCoords += totalDistortion;
 	reflectTexCoords.x = clamp(reflectTexCoords.x, 0.001, 0.999);

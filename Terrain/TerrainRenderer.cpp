@@ -27,9 +27,9 @@ TerrainRenderer::~TerrainRenderer()
 void TerrainRenderer::generate() {
 	PerlinNoise noise(237);
 
-	double dist = 20.0;
-	double heightScale = 20;
-	double heightOffset = -9;
+	double dist = 25.0;
+	double heightScale = 40;
+	double heightOffset = -20;
 	bufferSize = cols*rows * 8 * 2;
 	terrainVertices = new GLfloat[bufferSize];
 	int i = 0;

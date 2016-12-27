@@ -20,7 +20,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void do_movement();
 
 // window dimensions
-const GLuint WIDTH = 1800, HEIGHT = 1200;
+const GLuint WIDTH = 1920, HEIGHT = 1080;
 
 // camera
 Camera camera(glm::vec3(0.0f, 10.0f, 3.0f));
@@ -52,6 +52,7 @@ int main() {
 
 	// OpenGL options
 	glEnable(GL_DEPTH_TEST);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// register callbacks
 	glfwSetKeyCallback(window, key_callback);
@@ -96,7 +97,7 @@ int main() {
 		float distance = 2 * (camera.Position.y - waterHeight);
 		camera.Position.y -= distance;
 		camera.InvertPitch();
-		terrain.Render(camera, glm::vec4(0.0f, 1.0f, 0.0f, -waterHeight+0.5f), waterHeight);
+		terrain.Render(camera, glm::vec4(0.0f, 1.0f, 0.0f, -waterHeight+1.0f), waterHeight);
 		camera.Position.y += distance;
 		camera.InvertPitch();
 		water.UnbindBuffer();

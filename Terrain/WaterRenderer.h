@@ -3,6 +3,11 @@
 #include "Shader.h"
 #include "Camera.h"
 
+#define REFLECTION_WIDTH 320
+#define REFLECTION_HEIGHT 180
+#define REFRACTION_WIDTH 1280
+#define REFRACTION_HEIGHT 720
+
 class WaterRenderer : public Renderer
 {
 private:
