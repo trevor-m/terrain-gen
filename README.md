@@ -1,6 +1,8 @@
 # terrain-gen
 Procedurally generates a terrain and displays it with OpenGL.
 
+<img width="961" alt="terrain-gen2" src="https://cloud.githubusercontent.com/assets/12981474/21541759/d21f18be-cd6d-11e6-9fce-8a394b934e10.png">
+
 <img width="900" alt="terrain-gen" src="https://cloud.githubusercontent.com/assets/12981474/21300633/757424b2-c55a-11e6-98d1-ab0ce533653e.png">
 
 
